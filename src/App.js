@@ -1,24 +1,26 @@
-import logo from './logo.svg';
+import { BrowserRouter ,Routes,Route} from 'react-router-dom';
 import './App.css';
+import PageComponent from './components/PageComponent';
+import UserDashboard from './components/UserDashboard';
+import Error from './components/Error';
+import { ToastContainer,Slide } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import ProtectedRoutes from './components/ProtectedRoutes';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<PageComponent/>}/>
+          <Route element={<ProtectedRoutes/>}>
+            <Route path="/userDashboard" element={<UserDashboard/>}/>
+          </Route>
+            <Route path="*" element={<Error/>}/>
+        </Routes>
+      </BrowserRouter>
+      <ToastContainer transition={Slide}/> 
+    </>
   );
 }
 
