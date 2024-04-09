@@ -8,6 +8,7 @@ import showTaostify from './showTaostify';
 import { useNavigate } from 'react-router-dom'
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
+import Swal from 'sweetalert2'
 const UserDashboard = () => {
     const navigate = useNavigate()
     const [show, setShow] = useState(false);
@@ -68,19 +69,52 @@ const UserDashboard = () => {
         getExpense()
     }, [])
     const logoutUser = () => {
-        localStorage.removeItem('userLoggedIn');
-        navigate('/')
+        Swal.fire({
+            title: "Log out?",
+            text: "You won't be able to revert this!",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#254061",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Logout!"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Swal.fire({
+                title: "Logged Out!",
+                icon: "success"
+              });
+              localStorage.removeItem('userLoggedIn');
+                navigate('/')
+            }
+          });
+        
     }
     const deleteUser = async () => {
-        if (window.confirm('Are you sure you want to delete your account?')) {
-            let email = userLoggedin[0].email
-            const res = await axios.delete(`http://localhost:1923/api/v1/user/deleteUser/${email}`)
-            showTaostify(res.data.success, res.data.msg)
-            if (res.data.success) {
-                navigate('/')
-                localStorage.removeItem('userLoggedIn')
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#254061",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+                let email = userLoggedin[0].email
+                const res = await axios.delete(`http://localhost:1923/api/v1/user/deleteUser/${email}`)
+                // showTaostify(res.data.success, res.data.msg)
+                if (res.data.success) {
+                    navigate('/')
+                    localStorage.removeItem('userLoggedIn')
+                }
+              Swal.fire({
+                title: "Deleted!",
+                icon: "success"
+              });
             }
-        }
+          });
+            
+        
     }
     const handleClose = () => {
         setShow(false)
