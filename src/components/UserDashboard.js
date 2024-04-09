@@ -26,7 +26,10 @@ const UserDashboard = () => {
     const [days30, setdays30] = useState([]);
     const [day180, setday180] = useState([]);
     const [day366, setday366] = useState([]);
-    const [name, setname] = useState('Show All');
+    // const [name, setname] = useState('Show All');
+    const [startDate,setStartDate] = useState('')
+    const [endDate,setendDate] = useState('')
+    const [dateRangeArr,setdateRangeArr] = useState(null)
     const [dateValid, setdateValid] = useState({ isValid: true, msg: 'Required' });
     const [amountValid, setamountValid] = useState({ isValid: true, msg: 'Required' });
     const [date, setdate] = useState(new Date().toISOString().slice(0, 10))
@@ -178,10 +181,12 @@ const UserDashboard = () => {
             html: '#myTable',
             columns: [0, 1, 2, 3, 4]
         })
+        let finalY = doc.lastAutoTable.finalY; // The y position on the page
+        doc.text(20, finalY+10, `Total Expense:- ${total}`)
         doc.save('Expense.pdf')
     }
 
-    const searchFilter = userExpense.filter((data, index) => {
+    const searchFilter = dateRangeArr?.length>=0 ?dateRangeArr  : userExpense.filter((data, index) => {
         return data.date.includes(search) || data.paymentMode.toLowerCase().includes(search) || data.amount.toString().includes(search) || data.description.toLowerCase().includes(search)
     })
     const searchHandler = (e) => {
@@ -191,6 +196,7 @@ const UserDashboard = () => {
     const selectHandler = (e) => {
         // setselect(e.target.value)
         setdaySelect(e.target.value)
+        setdateRangeArr(null)
         console.log(day366)
         let value = e.target.value
         if (e.target.value != 'Select') {
@@ -245,8 +251,34 @@ const UserDashboard = () => {
         setdaySelect('Select')
         setsearch('')
         getExpense()
+        setStartDate('')
+        setendDate('')
+        setdateRangeArr(null)
         // startIndex(0)
         // endIndex(4)
+    }
+
+    const dateRangeHandler = () =>{
+        // console.log(startDate,endDate)
+        let date = new Date()
+        let endDate1 = new Date(endDate)
+        let startDate1 = new Date(startDate)
+        if(startDate === '' || endDate===''){
+            showTaostify(false,'Please enter the range')
+        }else{
+
+            if(endDate<startDate){
+                showTaostify(false,'startdate should be greater than end date')
+            }else if(endDate1>date || startDate1>date){
+                showTaostify(false,'No future dates allowed')
+            }else{
+                let arr = userExpense.filter((data)=>(data.date.slice(0,10)>=startDate && data.date.slice(0,10)<=endDate))
+                // setuserExpense(arr)
+                console.log(arr)
+                setdateRangeArr(arr)
+                // setendDate('')
+            }
+        }
     }
     let total = 0
     return (
@@ -284,6 +316,19 @@ const UserDashboard = () => {
                     </div>
                     <div className='col-xl-3 col-lg-3 col-md-3 col-12'>
                         <button className='btn btn-danger w-100' type='button' onClick={() => resetHandler()}>Reset</button>
+                    </div>
+                </div>
+                <div className='row mt-2'>
+                    <div className='col-4'>
+                        <label className='form-label'>Start Date</label>
+                        <input type='date' value={startDate} onChange={(e)=>setStartDate(e.target.value)} className='form-control'/>
+                    </div>
+                    <div className='col-4'>
+                        <label className='form-label'>End Date</label>
+                        <input type='date' value={endDate} onChange={(e)=>setendDate(e.target.value)} className='form-control'/>
+                    </div>
+                    <div className='col-4 mt-4'>
+                        <button onClick={dateRangeHandler} type='button' className='w-100 btn btn-dark mt-1'>Apply</button>
                     </div>
                 </div>
                 <Modal className='modal-lg' show={show} onHide={handleClose}>
@@ -400,21 +445,18 @@ const UserDashboard = () => {
                                     <td colSpan={6} className='text-center'> <h5> No data Found...</h5></td>
                                 </tr>}
                     </tbody>
-                    <tfoot hidden={total ? false : true}>
-                        <tr className='text-center'>
-                            <td colSpan={6}> <h5>Total Expense:- {total}</h5></td>
-                        </tr>
-                    </tfoot>
+                   
                 </table>
             </div>
             <hr />
-            <div className='d-flex justify-content-between'>
+            <div className='d-flex justify-content-around mb-4'>
                 <button className='btn btn-dark' onClick={toPDF} hidden={searchFilter.length > 0 ? false : true}>Export Pdf</button>
-                <div className='d-flex gap-2'>
+                <h5>Total Expense:- {total}</h5>
+                {/* <div className='d-flex gap-2'> */}
                     {/* <button className='btn btn-dark' onClick={allHandler}>{name}</button> */}
                     {/* <button className='btn btn-dark' onClick={prevHandler} disabled={startIndex===0}>Previous</button>
                         <button onClick={nextHandler} className='btn btn-dark' disabled={endIndex+1>=searchFilter.length?true:false}>Next</button> */}
-                </div>
+                {/* </div> */}
             </div>
         </div >
         </>

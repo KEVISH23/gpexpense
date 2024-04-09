@@ -9,7 +9,7 @@ const showTaostify = (type,msg) => {
         autoClose: 1000,
         closeOnClick: true,
         draggable: false,
-        theme: "colored",
+        theme: "light",
         pauseOnHover:false,
         // transition:Slide
       });
@@ -19,7 +19,7 @@ const showTaostify = (type,msg) => {
         autoClose: 1000,
         closeOnClick: true,
         draggable: false,
-        theme: "colored",
+        theme: "light",
       })
       break;
     default:return false

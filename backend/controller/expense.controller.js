@@ -53,7 +53,7 @@ const updateById = async (req, res) => {
         const expense = await Expense.findByIdAndUpdate(id, req.body)
         if (!expense) {
             res.status(404).json({ success: false, msg: 'Not found any data' })
-        } else {
+        } else{
             res.status(200).json({ success: true, msg: 'expense updated successfully', expense })
         }
     } catch (error) {

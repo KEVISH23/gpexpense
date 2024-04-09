@@ -20,15 +20,19 @@ const Signup = (props) => {
               password
             })
               showTaostify(res.data.success,res.data.msg)
+              if(res.data.success){
+
+                setemail('')
+                setpassword('')
+                setcpass('')
+                setname('')
+                props.propState(true)
+              }
             } catch (error) {
               // console.log(error)
               showTaostify(false,'Error in regestering')
             }
             
-            setemail('')
-            setpassword('')
-            setcpass('')
-            setname('')
         }
     }
     const validate = () =>{
