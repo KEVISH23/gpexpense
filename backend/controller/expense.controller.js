@@ -36,13 +36,13 @@ const getExpenseByEmail = async (req, res) => {
             let days_12m = expense.filter(data => {
                 let enterDate = new Date(data.date)
                 let diff = Math.ceil(((date - enterDate) / (1000 * 60 * 60 * 24)))
-                console.log(diff)
+                //console.log(diff)
                 return diff >= 0 && diff <= 366
             })
             res.status(200).json({ success: true, msg: 'expense fetched successfully', expense,days_7,days_30,days_6m,days_12m })
         }
     } catch (error) {
-        console.log(error)
+        //console.log(error)
         res.status(500).json({ success: false, msg: 'fetch expense Error' })
     }
 }
@@ -57,7 +57,7 @@ const updateById = async (req, res) => {
             res.status(200).json({ success: true, msg: 'expense updated successfully', expense })
         }
     } catch (error) {
-        console.log(error)
+        //console.log(error)
         res.status(500).json({ success: false, msg: 'update expense Error' })
     }
 }
@@ -72,7 +72,7 @@ const deleteById = async (req, res) => {
             res.status(200).json({ success: true, msg: 'expense deleted successfully', expense })
         }
     } catch (error) {
-        console.log(error)
+        //console.log(error)
         res.status(500).json({ success: false, msg: 'delete expense Error' })
     }
 }

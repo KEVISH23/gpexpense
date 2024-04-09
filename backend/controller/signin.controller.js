@@ -3,9 +3,9 @@ const Expense = require("../models/expenseSchema.js")
 const addUser = async(req,res)=>{
     try{
         let {email} = req.body
-        console.log(email)
+        //console.log(email)
         const user = await User.find({email})
-        console.log(user)
+        //console.log(user)
         if(user.length){
             res.status(200).json({success:false,msg:'Email already registered'})
         }else{
@@ -13,7 +13,7 @@ const addUser = async(req,res)=>{
             res.status(200).json({success:true,msg:'Register successfully'})
         }
     }catch(error){
-        console.log(error);
+        //console.log(error);
         res.status(500).json({success:false,msg:'Add User Error'})
     }
 }
@@ -33,7 +33,7 @@ const loginUser = async(req,res)=>{
 const deleteUser = async(req,res)=>{
     try{
         let {email} = req.params
-        let user = await User.findOneAndDelete(email);
+        let user = await User.findOneAndDelete({email});
         let deleteapi = await Expense.deleteMany({email});
         if(!user){
             res.status(200).json({success:false,msg:'User not found'})
