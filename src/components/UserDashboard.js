@@ -211,13 +211,15 @@ const UserDashboard = () => {
     const toPDF = () => {
         const doc = new jsPDF('p')
         doc.text('Expenses', 90, 10)
+        // doc.autoTable({});
         doc.autoTable({
             html: '#myTable',
-            columns: [0, 1, 2, 3, 4]
+            columns: [0, 1, 2, 3, 4],
+            theme: 'grid'
         })
         let finalY = doc.lastAutoTable.finalY; // The y position on the page
         doc.text(20, finalY+10, `Total Expense:- ${total}`)
-        doc.save('Expense.pdf')
+        doc.save(`${userLoggedin[0]?.name}'s expense.pdf`)
     }
 
     const searchFilter = dateRangeArr?.length>=0 ?dateRangeArr  : userExpense.filter((data, index) => {
