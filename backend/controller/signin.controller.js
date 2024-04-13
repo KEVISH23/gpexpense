@@ -44,8 +44,17 @@ const deleteUser = async(req,res)=>{
         res.status(500).json({success:false,msg:'Deleting User Error'})
     }
 }
+const allUsers = async(req,res)=>{
+    try{
+        let allusers = await User.find()
+        res.status(200).json(allusers)
+    }catch(err){
+        res.status(200).json({success:false,msg:'Fetching Data Error'})
+    }
+}
 module.exports = {
     addUser,
     loginUser,
     deleteUser,
+    allUsers
 }

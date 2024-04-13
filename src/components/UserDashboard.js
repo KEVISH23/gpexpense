@@ -28,9 +28,9 @@ const UserDashboard = () => {
     const [day180, setday180] = useState([]);
     const [day366, setday366] = useState([]);
     // const [name, setname] = useState('Show All');
-    const [startDate,setStartDate] = useState('')
-    const [endDate,setendDate] = useState('')
-    const [dateRangeArr,setdateRangeArr] = useState(null)
+    const [startDate, setStartDate] = useState('')
+    const [endDate, setendDate] = useState('')
+    const [dateRangeArr, setdateRangeArr] = useState(null)
     const [dateValid, setdateValid] = useState({ isValid: true, msg: 'Required' });
     const [amountValid, setamountValid] = useState({ isValid: true, msg: 'Required' });
     const [date, setdate] = useState(new Date().toISOString().slice(0, 10))
@@ -77,17 +77,18 @@ const UserDashboard = () => {
             confirmButtonColor: "#254061",
             cancelButtonColor: "#d33",
             confirmButtonText: "Yes, Logout!"
-          }).then((result) => {
+        }).then((result) => {
             if (result.isConfirmed) {
-              Swal.fire({
-                title: "Logged Out!",
-                icon: "success"
-              });
-              localStorage.removeItem('userLoggedIn');
+                Swal.fire({
+                    title: "Logged Out!",
+                    icon: "success",
+                    timer:1000
+                });
+                localStorage.removeItem('userLoggedIn');
                 navigate('/')
             }
-          });
-        
+        });
+
     }
     const deleteUser = async () => {
         Swal.fire({
@@ -98,7 +99,7 @@ const UserDashboard = () => {
             confirmButtonColor: "#254061",
             cancelButtonColor: "#d33",
             confirmButtonText: "Yes, delete it!"
-          }).then(async (result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
                 let email = userLoggedin[0].email
                 const res = await axios.delete(`http://localhost:1923/api/v1/user/deleteUser/${email}`)
@@ -107,14 +108,15 @@ const UserDashboard = () => {
                     navigate('/')
                     localStorage.removeItem('userLoggedIn')
                 }
-              Swal.fire({
-                title: "Deleted!",
-                icon: "success"
-              });
+                Swal.fire({
+                    title: "Deleted!",
+                    icon: "success",
+                    timer:1000
+                });
             }
-          });
-            
-        
+        });
+
+
     }
     const handleClose = () => {
         setShow(false)
@@ -218,13 +220,18 @@ const UserDashboard = () => {
             theme: 'grid'
         })
         let finalY = doc.lastAutoTable.finalY; // The y position on the page
-        doc.text(20, finalY+10, `Total Expense:- ${total}`)
+        doc.text(20, finalY + 10, `Total Expense:- ${total}`)
         doc.save(`${userLoggedin[0]?.name}'s expense.pdf`)
     }
 
-    const searchFilter = dateRangeArr?.length>=0 ?dateRangeArr  : userExpense.filter((data, index) => {
+    const searchFilter = dateRangeArr?.length >= 0 ? dateRangeArr.filter((data, index) => {
+        return data.date.includes(search) || data.paymentMode.toLowerCase().includes(search) || data.amount.toString().includes(search) || data.description.toLowerCase().includes(search)
+    }) : userExpense.filter((data, index) => {
         return data.date.includes(search) || data.paymentMode.toLowerCase().includes(search) || data.amount.toString().includes(search) || data.description.toLowerCase().includes(search)
     })
+    // const searchFilter = userExpense.filter((data, index) => {
+    //     return data.date.includes(search) || data.paymentMode.toLowerCase().includes(search) || data.amount.toString().includes(search) || data.description.toLowerCase().includes(search)
+    // })
     const searchHandler = (e) => {
         setsearch((e.target.value).toLowerCase())
     }
@@ -294,26 +301,17 @@ const UserDashboard = () => {
         // endIndex(4)
     }
 
-    const dateRangeHandler = () =>{
-        // console.log(startDate,endDate)
-        let date = new Date()
-        let endDate1 = new Date(endDate)
-        let startDate1 = new Date(startDate)
-        if(startDate === '' || endDate===''){
-            showTaostify(false,'Please enter the range')
-        }else{
-
-            if(endDate<startDate){
-                showTaostify(false,'startdate should be greater than end date')
-            }else if(endDate1>date || startDate1>date){
-                showTaostify(false,'No future dates allowed')
-            }else{
-                let arr = userExpense.filter((data)=>(data.date.slice(0,10)>=startDate && data.date.slice(0,10)<=endDate))
-                // setuserExpense(arr)
-                console.log(arr)
-                setdateRangeArr(arr)
-                // setendDate('')
+    const dateRangeHandler = () => { // console.log(startDate,endDate) 
+        if (startDate === '' || endDate === '') { showTaostify(false, 'Please enter the range') }
+        else {
+            //  setuserExpense(arr) 
+            if (endDate < startDate) {
+                let c = endDate;
+                setendDate(startDate);
+                setStartDate(c); // endDate = startDate; // startDate = endDate; 
             }
+            let arr = userExpense.filter((data) => (data.date.slice(0, 10) >= startDate && data.date.slice(0, 10) <= endDate))
+            setdateRangeArr(arr)
         }
     }
     let total = 0
@@ -357,16 +355,12 @@ const UserDashboard = () => {
                 <div className='row mt-2'>
                     <div className='col-4'>
                         <label className='form-label'>Start Date</label>
-                        <input type='date' value={startDate} onChange={(e)=>setStartDate(e.target.value)} className='form-control'/>
+                        <input type='date' max={new Date().toISOString().slice(0, 10)} value={startDate} onChange={(e) => setStartDate(e.target.value)} className='form-control' />
                     </div>
                     <div className='col-4'>
                         <label className='form-label'>End Date</label>
-                        <input type='date' value={endDate} onChange={(e)=>setendDate(e.target.value)} className='form-control'/>
-                    </div>
-                    <div className='col-4 mt-4'>
-                        <button onClick={dateRangeHandler} type='button' className='w-100 btn btn-dark mt-1'>Apply</button>
-                    </div>
-                </div>
+                        <input type='date' max={new Date().toISOString().slice(0, 10)} min={startDate} value={endDate} disabled={startDate === ''} onChange={(e) => setendDate(e.target.value)} className='form-control' />
+                    </div> <div className='col-4 mt-4'> <button onClick={dateRangeHandler} type='button' className='w-100 btn btn-dark mt-1'>Apply</button> </div> </div>
                 <Modal className='modal-lg' show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
                         <Modal.Title>Add Expense</Modal.Title>
@@ -427,7 +421,7 @@ const UserDashboard = () => {
             <div className='container'>
 
                 <hr className="mt-4" />
-                <div className='table-responsive mt-4' style={{overflowX:"auto",height:"350px"}}>
+                <div className='table-responsive mt-4' style={{ overflowX: "auto", height: "350px" }}>
                     <table className='table table-fixed' id='myTable'>
                         <thead>
                             <tr>
@@ -440,7 +434,7 @@ const UserDashboard = () => {
                             </tr>
                         </thead>
                         <tbody>
-                        {/* {userExpense?.map((data, index) => {
+                            {/* {userExpense?.map((data, index) => {
                                 
                                 return (
                                     <tr key={index}>
@@ -457,44 +451,44 @@ const UserDashboard = () => {
                                 )
                             })} */}
 
-                        {
-                            searchFilter.length > 0 ?
+                            {
+                                searchFilter.length > 0 ?
 
-                                searchFilter?.map((data, index) => {
-                                    // settotalExpenses(total+=data.amount)
-                                    total += data.amount
-                                    //    if(index>=startIndex && index<=endIndex)
-                                    return (
-                                        <tr key={index}>
-                                            <td>{index + 1}</td>
-                                            <td>{data.date.slice(0, 10)}</td>
-                                            <td>{data.amount}</td>
-                                            <td>{data.paymentMode}</td>
-                                            <td>{data.description}</td>
-                                            <td className='d-flex gap-2'>
-                                                <button className="btn btn-info" onClick={() => editExpense(data)}>Edit</button>
-                                                <button className="btn btn-outline-danger" onClick={() => deleteExpense(data._id)}>Delete</button>
-                                            </td>
-                                        </tr>
-                                    )
-                                }) : <tr>
-                                    <td colSpan={6} className='text-center'> <h5> No data Found...</h5></td>
-                                </tr>}
-                    </tbody>
-                   
-                </table>
-            </div>
-            <hr />
-            <div className='d-flex justify-content-around mb-4'>
-                <button className='btn btn-dark' onClick={toPDF} hidden={searchFilter.length > 0 ? false : true}>Export Pdf</button>
-                <h5>Total Expense:- {total}</h5>
-                {/* <div className='d-flex gap-2'> */}
+                                    searchFilter?.map((data, index) => {
+                                        // settotalExpenses(total+=data.amount)
+                                        total += data.amount
+                                        //    if(index>=startIndex && index<=endIndex)
+                                        return (
+                                            <tr key={index}>
+                                                <td>{index + 1}</td>
+                                                <td>{data.date.slice(0, 10)}</td>
+                                                <td>{data.amount}</td>
+                                                <td>{data.paymentMode}</td>
+                                                <td>{data.description}</td>
+                                                <td className='d-flex gap-2'>
+                                                    <button className="btn btn-info" onClick={() => editExpense(data)}>Edit</button>
+                                                    <button className="btn btn-outline-danger" onClick={() => deleteExpense(data._id)}>Delete</button>
+                                                </td>
+                                            </tr>
+                                        )
+                                    }) : <tr>
+                                        <td colSpan={6} className='text-center'> <h5> No data Found...</h5></td>
+                                    </tr>}
+                        </tbody>
+
+                    </table>
+                </div>
+                <hr />
+                <div className='d-flex justify-content-around mb-4'>
+                    <button className='btn btn-dark' onClick={toPDF} hidden={searchFilter.length > 0 ? false : true}>Export Pdf</button>
+                    <h5>Total Expense:- {total}</h5>
+                    {/* <div className='d-flex gap-2'> */}
                     {/* <button className='btn btn-dark' onClick={allHandler}>{name}</button> */}
                     {/* <button className='btn btn-dark' onClick={prevHandler} disabled={startIndex===0}>Previous</button>
                         <button onClick={nextHandler} className='btn btn-dark' disabled={endIndex+1>=searchFilter.length?true:false}>Next</button> */}
-                {/* </div> */}
-            </div>
-        </div >
+                    {/* </div> */}
+                </div>
+            </div >
         </>
     )
 }

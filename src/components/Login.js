@@ -33,18 +33,24 @@ const Login = (props) => {
       setpassValid({ isValid: true, msg: '' })
     }
     if(bool){
-      try {
-        let res = await axios.post('http://localhost:1923/api/v1/user/loginUser',{
-          email,
-          password
-        })
-        showTaostify(res.data.success,res.data.msg)
-        if(res.data.success){
-          localStorage.setItem('userLoggedIn',JSON.stringify(res.data.user))
-          navigate('/userDashboard')
+      if(email==='admin@kt.com' && password==='admin@123'){
+        localStorage.setItem('userLoggedIn',JSON.stringify({user:'admin'}))
+        navigate('/admin')
+      }else{
+
+        try {
+          let res = await axios.post('http://localhost:1923/api/v1/user/loginUser',{
+            email,
+            password
+          })
+          showTaostify(res.data.success,res.data.msg)
+          if(res.data.success){
+            localStorage.setItem('userLoggedIn',JSON.stringify(res.data.user))
+            navigate('/userDashboard')
+          }
+        } catch (error) {
+          showTaostify(false,'Error in login')
         }
-      } catch (error) {
-        showTaostify(false,'Error in login')
       }
       setemail('')
       setpassword('')
